@@ -28,6 +28,8 @@ Run `make all` in the `src` directory of this project to build `m5_soundfile`. T
 
 Copy the resulting `m5_soundfile` library file to a place where Pd can find it.
 
+To include these objects in your patch, use `declare -lib m5_soundfile`. See the patches in examples/ for details.
+
 ### What are the new features for m5_readsf\~ and m5_writesf\~ ?
 
 Fundamentally these new objects allow you to start/stop playback/recording at a specific sample-time. They also enable arbitrary loop lengths and input-threshold-start recording. 
