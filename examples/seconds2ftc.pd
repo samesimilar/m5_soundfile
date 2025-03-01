@@ -1,0 +1,14 @@
+#N canvas 149 522 875 300 12;
+#X obj 77 45 inlet;
+#X obj 201 81 samplerate~, f 16;
+#X obj 127 110 *;
+#X obj 133 214 list prepend 1 0;
+#X obj 133 248 outlet;
+#X text 206 136 This doesn't calculate epochs \, it will only be accurate up to a few minutes., f 21;
+#X obj 88 77 t f b;
+#X connect 0 0 6 0;
+#X connect 1 0 2 1;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 6 0 2 0;
+#X connect 6 1 1 0;
