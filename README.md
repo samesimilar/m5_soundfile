@@ -105,7 +105,7 @@ Next - start recording:
 - Send a `start` message with a single `float` parameter to start recording when the input signal level (as an absolute value) rises above the parameter. E.g. send `start 0.1` to start recording after m5_writesf\~ receives a sample with an abs value greater than 0.1.
 - Send a `start` message with a frame-time-code parameter to start recording at a specific global time.
 
-m5_writesf\~ will send the frame-time-code value of the actual global start time of recording to it's leftmost outlet, after recording starts.
+m5_writesf\~ will send the frame-time-code value of the actual global start time of recording to its leftmost outlet, after recording starts.
 
 Next - stop recording:
 
@@ -190,8 +190,10 @@ The `anchor_id` text is arbitrary - just use a unique one for each global timeli
 
 Send a `time anchor_id` message to your m5_readsf\~, m5_writesf\~ objects, probably before you do anything else with them, so that they all work on the same timeline.
 
-* Send a `bang` message to `m5_ftc_anchor` to output the current time code.
-* Send a `mark` message to set the current DSP time as T=0.
+Mostly you don't need to interact directly with m5_ftc_anchor objects, but there are a couple things you can do:
+
+* Send a `bang` message to `m5_ftc_anchor` to output the current time code, in case you want to see it.
+* Send a `mark` message to reset the current DSP time as T=0.
 
 ## Calculating Quantized Loop Times (m5_ftc_cycles)
 
