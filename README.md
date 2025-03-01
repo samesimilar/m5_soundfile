@@ -52,9 +52,9 @@ Fundamentally these new objects allow you to start/stop playback/recording at a 
 
 m5_readsf\~ (and m5_writesf\~) can work according to a global clock that you define. The frame-time-counts referenced in the instructions below are all relative to a global clock. Each global clock is identified by an arbitrary symbol. To tell m5_readsf~ which clock to use, send it a `time my_clock_anchor_id` message (e.g. to bind its clock to the clock anchor with `my_clock_anchor_id`). See the section below on `m5_ftc_anchor` for more info.
 
-Definition:
+Instantiation:
 
-Define m5_readsf\~ with the same parameters you would use for readsf\~. e.g. A single numerical parameter defines the number of channels. Say, '2' for stereo. Note only `.wav` files are supported currently.
+Create m5_readsf\~ instances with the same parameters you would use for readsf\~. e.g. A single numerical parameter defines the number of channels. Say, '2' for stereo. Note only `.wav` files are supported currently.
 
 Playback: 
 
@@ -93,7 +93,7 @@ When playback stops or fails for any reason, a `bang` message will be sent to th
 
 m5_writesf\~ (and m5_readsf\~) can work according to a global clock that you define. The frame-time-counts referenced in the instructions below are all relative to a global clock. Each global clock is identified by an arbitrary symbol. To tell m5_writesf~ which clock to use, send it a `time my_clock_anchor_id` message (e.g. to bind its clock to the clock anchor with `my_clock_anchor_id`). See the section below on `m5_ftc_anchor` for more info.
 
-Define m5_writesf\~ with the same parameters you would use for writesf\~. e.g. A single numerical parameter defines the number of channels. Say, '2' for stereo. Note only `.wav` files are supported currently.
+Make m5_writesf\~ instances with the same parameters you would use for writesf\~. e.g. A single numerical parameter defines the number of channels. Say, '2' for stereo. Note only `.wav` files are supported currently.
 
 Recording:
 
