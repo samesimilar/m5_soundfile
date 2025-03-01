@@ -4,9 +4,9 @@
 
 `m5_soundfile` is a library of external objects, based on the readsf\~ and writesf\~ objects in PureData, but upgraded for sample-accurate timing of recording/playback scheduling and looping. The aspiration is to enable perfect scheduling, including intra-audio-processing-blocks-precision level scheduling, but with a similar default API as the classic objects. 
 
-Primarily, there are two new objects here - m5_readsf\~ and m5_writesf\~. These are based heavily on the existing readsf\~ and writesf\~ objects from Pd Vanilla.
+Primarily, there are two new objects here - m5_readsf\~ and m5_writesf\~. By way of attribution, these are based on the original source code for the readsf\~ and writesf\~ objects from Pd Vanilla (I'm not implying that any bugs you find in this project are from the original authors  - use at your own risk!).
 
-To support the new features for reading and writing sound files with accurate timing, I have added several more objects to manage synchronized values that I call "Frame Time Codes" (FTCs). Simply, an FTC value represents a duration measured in counting sample-frames.
+To support the new features for reading and writing sound files with accurate timing, I've added several more objects to manage synchronized values that I call "Frame Time Codes" (FTCs). Simply, an FTC value represents a duration measured in counting sample-frames.
 
 FTC values and related objects are described later. 
 
@@ -20,7 +20,7 @@ See LICENSE.txt for details.
 
 ### Status
 
-This is a very initial, untested release of this code. Use at your own risk.
+This is a very initial, untested release of this code. Use at your own risk. Back up your stuff. Touch grass.
 
 ### Building And Installing
 
