@@ -2876,7 +2876,7 @@ static t_int *m5_writesf_perform(t_int *w)
 			
 		} 
 		// note: always true if x_m5PlayStartTime = START_AT_THRESHOLD
-		else if (blockStartTime < (size_t)x->x_m5PlayStartTime)
+		else if (blockStartTime <= (size_t)x->x_m5PlayStartTime)
 		{
 			if (blockStartTime + (size_t)vecsize > x->x_m5PlayStartTime)
 			{	
