@@ -10,6 +10,7 @@ lib.name = m5_soundfile
 
 $(lib.name).class.sources = m5_soundfile.c m5_soundfile_wave.c m5_timeanchor.c
 # cflags = -I$(pd.src)
+# cflags = -DDEBUG_READ_LOOP -DDEBUG_SOUNDFILE_THREADS 
 # cflags = -DDEBUG_SOUNDFILE_THREADS
 # cflags = -DDEBUG_READ_LOOP
 suppress-wunused = yes
