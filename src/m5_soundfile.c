@@ -104,7 +104,7 @@ const char* m5_soundfile_strerror(int errnum)
 		case SOUNDFILE_ERRSAMPLEFMT:
 			return "unsupported sample format";
 		case SOUNDFILE_M5_ERREMPTY:
-			return "sound file has 0 frames";
+			return "the sound file has 0 frames";
 		default: /* C/POSIX error */
 			return strerror(errnum);
 	}
@@ -1495,6 +1495,7 @@ static void *m5_readsf_child_main(void *zz)
 				// Usually 'nextseek' is auto-incremented as we read along the file.
 				// When head and tail are equal, there is a request for a fresh buffer, 
 				// so synchronize nextseek with newly requested time
+				ssize_t byte_time = 0;
 				if (x->x_fifohead == 0 && x->x_fifotail == 0) 
 				{
 					// get the time requested to start playing the loop
@@ -1502,7 +1503,7 @@ static void *m5_readsf_child_main(void *zz)
 					if (pst < 0) pst = 0;
 					
 					// current frame time at 'head', in bytes, relative to time anchor
-					ssize_t byte_time = ((ssize_t)x->x_m5HeadTimeRequest - (ssize_t)pst) * (ssize_t)sf.sf_bytesperframe;
+					byte_time = ((ssize_t)x->x_m5HeadTimeRequest - (ssize_t)pst) * (ssize_t)sf.sf_bytesperframe;
 					if (byte_time >= 0)
 					{
 						// calculate time within current audio loop
@@ -1520,6 +1521,12 @@ static void *m5_readsf_child_main(void *zz)
 					
 				}				
 
+				// nudge it around if on exactly the end of the loop
+				
+				if (nextSeek == loop_length_bytes + m5_initial_offset + loop_start_bytes) {
+					nextSeek = m5_initial_offset + loop_start_bytes;
+				}
+				
 				// max number of bytes that can be copied into FIFO before end of current audio loop
 				// We will go back to the beginning of the audio loop in the next iteration of this While loop
 				size_t loop_byte_limit = loop_length_bytes + m5_initial_offset + loop_start_bytes - nextSeek ;
@@ -1623,7 +1630,7 @@ static void *m5_readsf_child_main(void *zz)
 				// zeroes to fill out FIFO if our audio loop extends past end of file
 				ssize_t wantzeroes = wantbytes - actual_bytes_to_want;
 #ifdef DEBUG_READ_LOOP
-				fprintf(stderr, "loop: %ld %ld %ld %ld %ld %ld %ld %ld\n", loop_length_bytes, nextSeek, wantbytes, actual_bytes_to_want, wantzeroes, m5_seek_max, loop_byte_limit, m5_initial_offset);
+				fprintf(stderr, "loop: %ld, %ld %ld %ld %ld %ld %ld %ld %ld\n", byte_time, loop_length_bytes, nextSeek, wantbytes, actual_bytes_to_want, wantzeroes, m5_seek_max, loop_byte_limit, m5_initial_offset);
 #endif
 
 				
@@ -2026,6 +2033,11 @@ static t_int *m5_readsf_perform(t_int *w)
 				for (j = zerosize, fp = x->x_outvec[i]; j--;)
 					*fp++ = 0;
 			pthread_mutex_lock(&x->x_mutex);
+			/* resync local variables */
+			vecsize = x->x_vecsize;
+			m5_soundfile_copy(&sf, &x->x_sf);
+			
+			
 			int xfersize = vecsize - zerosize;
 			
 			if (xfersize)
