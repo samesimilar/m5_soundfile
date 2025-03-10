@@ -1865,6 +1865,7 @@ static t_int *m5_readsf_perform(t_int *w)
 				if (x->x_fileerror) {
 					m5_object_sferror(x, "[readsf~]", x->x_filename,x->x_fileerror, &x->x_sf);
 					x->x_state = STATE_IDLE;
+					clock_delay(x->x_m5FramesOutClock, 0);
 					clock_delay(x->x_clock, 0);	
 				}
 				pthread_mutex_unlock(&x->x_mutex);
@@ -2093,6 +2094,7 @@ static t_int *m5_readsf_perform(t_int *w)
 			if (x->x_fileerror) {
 				m5_object_sferror(x, "[readsf~]", x->x_filename,x->x_fileerror, &x->x_sf);
 				x->x_state = STATE_IDLE;
+				clock_delay(x->x_m5FramesOutClock, 0);
 				clock_delay(x->x_clock, 0);	
 			}
 			
