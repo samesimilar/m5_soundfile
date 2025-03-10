@@ -69,6 +69,7 @@ typedef struct _m5FTCcycles
 	t_outlet *x_timeOut;
 	t_symbol *x_anchorSym;
 	t_m5FrameTimeCode x_loopLength;
+	t_m5FrameTimeCode x_offset;
 	long x_safety;
 	
 } t_m5FTCCycles;

@@ -142,10 +142,11 @@ char m5_loop_position_from_clock_time(double clock, t_m5FrameTimeCode *loop_leng
 }
 
 // 'safety' allows for a constant offset for every calculation in case some extra time is needed
-char m5_loop_start_from_clock_time(double clock, t_m5FrameTimeCode *loop_length, long offset_loops, long safety,  t_m5FrameTimeCode *out)
+char m5_loop_start_from_clock_time(double clock, t_m5FrameTimeCode *offset, t_m5FrameTimeCode *loop_length, long offset_loops, long safety,  t_m5FrameTimeCode *out)
 {
-	long loop_frames = m5_frames_from_time_code(loop_length);
-	long lclock = (long)clock;
+	long offset_frames = m5_frames_from_time_code(offset);
+	long loop_frames = m5_frames_from_time_code(loop_length);	
+	long lclock = (long)clock - offset_frames;
 	if (loop_frames < 0) 
 	{
 		return 1;
@@ -160,7 +161,7 @@ char m5_loop_start_from_clock_time(double clock, t_m5FrameTimeCode *loop_length,
 		m5_frame_time_code_from_frames(lclock + (offset_loops * loop_frames) + safety, out);
 		return 0;
 	}
-	long next_start_frame = lclock + loop_frames - now_frame + (offset_loops * loop_frames) + safety;
+	long next_start_frame = lclock + loop_frames + offset_frames - now_frame + (offset_loops * loop_frames) + safety;
 	m5_frame_time_code_from_frames(next_start_frame, out);
 	return 0;
 }
@@ -373,7 +374,7 @@ static void m5_ftc_cycles_get_start_time(t_m5FTCCycles *x, long offset_loops, lo
 	t_m5FrameTimeCode startFTC;
 
 	char e = 0;
-	if ((e = m5_loop_start_from_clock_time(now, &x->x_loopLength, offset_loops, x->x_safety, &startFTC)))
+	if ((e = m5_loop_start_from_clock_time(now, &x->x_offset, &x->x_loopLength, offset_loops, x->x_safety, &startFTC)))
 	{
 		pd_error(x, "m5ftcCycles: Error getting start time: %d", e);
 		return;
@@ -435,10 +436,18 @@ static void m5_ftc_cycles_loop_length(t_m5FTCCycles *x, t_symbol *s, int argc, t
 {
 	
 	if (m5_frame_time_code_from_atoms(argc, argv, &x->x_loopLength)) {
-		pd_error (x,"m5ftcCycles: A frame time code must be three floats... 1|-1, epoch, frames.");
+		pd_error (x,"m5ftcCycles looplength: A frame time code must be three floats... 1|-1, epoch, frames.");
 		return;
 	} 
 	
+}
+
+static void m5_ftc_cycles_offset(t_m5FTCCycles *x, t_symbol *s, int argc, t_atom *argv)
+{
+	if (m5_frame_time_code_from_atoms(argc, argv, &x->x_offset)) {
+		pd_error (x,"m5ftcCycles offset: A frame time code must be three floats... 1|-1, epoch, frames.");
+		return;
+	} 
 }
 
 static void m5_ftc_cycles_loop_count(t_m5FTCCycles *x, t_symbol *s, int argc, t_atom *argv)
@@ -467,6 +476,7 @@ static void *m5_ftc_cycles_new(t_symbol*s, int argc, t_atom*argv)
 	x->x_anchorSym = atom_getsymbolarg(0, argc, argv);
 	
 	m5_frame_time_code_init(&x->x_loopLength);
+	m5_frame_time_code_init(&x->x_offset);
 	m5_frame_time_code_from_atoms(argc, argv, &x->x_loopLength);
 	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("list"), gensym("loop_length"));
 	
@@ -490,6 +500,7 @@ void m5_ftc_cycles_setup(void)
 		A_GIMME, 0);	
 		
 	class_addmethod(m5_ftc_cycles_class, (t_method)m5_ftc_cycles_loop_length, gensym("loop_length"), A_GIMME, 0);
+	class_addmethod(m5_ftc_cycles_class, (t_method)m5_ftc_cycles_offset, gensym("offset"), A_GIMME, 0);
 	class_addmethod(m5_ftc_cycles_class, (t_method)m5_ftc_cycles_start_time, gensym("get_start"), 0);
 	class_addmethod(m5_ftc_cycles_class, (t_method)m5_ftc_cycles_loop_count, gensym("count"), A_GIMME, 0);
 	class_addlist(m5_ftc_cycles_class, (t_method)m5_ftc_cycles_list);
