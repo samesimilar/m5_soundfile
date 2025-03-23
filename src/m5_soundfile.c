@@ -52,6 +52,10 @@ objects use Posix-like threads. */
 
 #define NOT_FOUND -1
 
+#define RAMP_FRAMES 10
+const t_sample ramp_up[RAMP_FRAMES] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+const t_sample ramp_down[RAMP_FRAMES] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0};
+
 // MWS other functions from PD not in .h files here:
 // note this function is 'static' in Pd 0.51 - need to 
 // find a local replacement here...
@@ -1906,12 +1910,37 @@ static t_int *m5_readsf_perform(t_int *w)
 			x->x_m5PlayStartTime = blockStartTime;
 		}
 		
+		
+		
 		// reset the fifo so that it starts filling from the current block time
-		// Do this if parameters (start/length) for audio loop changed or if the tail
-		// somehow is not lined up with the current needed frame clock
-		if (x->x_m5LoopLengthRequest || (size_t)x->x_m5TailTime != (size_t)blockStartTime) {		
+		// Do this if parameters (start/length) for audio loop changed
+		// if (x->x_m5LoopLengthRequest || ((size_t)x->x_m5TailTime != (size_t)blockStartTime)) {		
+		if (x->x_m5LoopLengthRequest) {		
 			x->x_m5LoopLengthRequest = 0;
 			x->x_fifohead = x->x_fifotail = x->x_eof = 0;
+		}
+		
+		// if the tail
+		// somehow is not lined up with the current needed frame clock, check to see if we can fast-forward
+		// otherwise reset the fifo like with x_m5LoopLengthRequest
+		if ((size_t)x->x_m5TailTime != (size_t)blockStartTime) {
+			ssize_t time_out = (ssize_t)blockStartTime - (ssize_t)x->x_m5TailTime;
+			if (time_out < 0) {
+				x->x_fifohead = x->x_fifotail = x->x_eof = 0;
+			}
+			size_t forward_limit = 0;
+			if (x->x_fifohead < x->x_fifotail) {
+				forward_limit = x->x_fifosize;
+			} else {
+				forward_limit = x->x_fifohead;
+			}
+			if ((time_out + x->x_fifotail < forward_limit)) {
+				x->x_fifotail += time_out;
+				x->x_m5TailTime = blockStartTime;
+			} else {
+				x->x_fifohead = x->x_fifotail = x->x_eof = 0;
+			}
+
 		}
 		
 		// tail and head wound up in the same place, so update start time
@@ -1925,25 +1954,41 @@ static t_int *m5_readsf_perform(t_int *w)
 		wantbytes = vecsize * sf.sf_bytesperframe;
 		
 		
-		// fill fifo (and wait for file to finish opening, if needed)		
-		while (!x->x_eof && x->x_fifohead >= x->x_fifotail &&
-				x->x_fifohead < x->x_fifotail + wantbytes-1)
+		// if fifo is not ready, play silence and return
+		if (!x->x_eof && x->x_fifohead >= x->x_fifotail &&
+		x->x_fifohead < x->x_fifotail + wantbytes-1) 
 		{
+			pthread_mutex_unlock(&x->x_mutex);
+			for (i = 0; i < noutlets; i++){
+				for (j = vecsize, fp = x->x_outvec[i]; j--;){
+					*fp++ = 0;
+				}
+			}
 			
-#ifdef DEBUG_SOUNDFILE_THREADS
-			fprintf(stderr, "readsf~: wait...\n");
-#endif
-			sfread_cond_signal(&x->x_requestcondition);
-			sfread_cond_wait(&x->x_answercondition, &x->x_mutex);
-				/* resync local variables -- bug fix thanks to Shahrokh */
-			vecsize = x->x_vecsize;
-			m5_soundfile_copy(&sf, &x->x_sf);
-			wantbytes = vecsize * sf.sf_bytesperframe;
-		
-#ifdef DEBUG_SOUNDFILE_THREADS
-			fprintf(stderr, "readsf~: ... done\n");
-#endif
+			
+			
+			return w+2;
 		}
+		
+// 		// fill fifo (and wait for file to finish opening, if needed)	
+// 		while (!x->x_eof && x->x_fifohead >= x->x_fifotail &&
+// 				x->x_fifohead < x->x_fifotail + wantbytes-1)
+// 		{
+// 			
+// #ifdef DEBUG_SOUNDFILE_THREADS
+// 			fprintf(stderr, "readsf~: wait...\n");
+// #endif
+// 			sfread_cond_signal(&x->x_requestcondition);
+// 			sfread_cond_wait(&x->x_answercondition, &x->x_mutex);
+// 				/* resync local variables -- bug fix thanks to Shahrokh */
+// 			vecsize = x->x_vecsize;
+// 			m5_soundfile_copy(&sf, &x->x_sf);
+// 			wantbytes = vecsize * sf.sf_bytesperframe;
+// 		
+// #ifdef DEBUG_SOUNDFILE_THREADS
+// 			fprintf(stderr, "readsf~: ... done\n");
+// #endif
+// 		}
 
 		if (x->x_fileerror) {
 			m5_object_sferror(x, "[readsf~]", x->x_filename,x->x_fileerror, &x->x_sf);
