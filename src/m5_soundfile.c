@@ -1608,6 +1608,7 @@ static void *m5_readsf_child_main(void *zz)
 				
 				off_t bytesSought = 0;
 				int last_fifohead = x->x_fifohead;
+				double last_headTimeRequest = x->x_m5HeadTimeRequest;
 				pthread_mutex_unlock(&x->x_mutex);
 				
 				// if nextSeek is within actual file
@@ -1668,7 +1669,7 @@ static void *m5_readsf_child_main(void *zz)
 				{
 					// Make sure fifohead wasn't reset by parent process during read, then auto-increment
 					// otherwise nextSeek will be updated above based on playStartTime and current time
-					if (x->x_fifohead == last_fifohead) {
+					if (x->x_fifohead == last_fifohead && x->x_m5HeadTimeRequest == last_headTimeRequest) {
 						x->x_fifohead += bytesread + wantzeroes;
 						if (x->x_fifohead == fifosize)
 							x->x_fifohead = 0;
@@ -1907,7 +1908,7 @@ static t_int *m5_readsf_perform(t_int *w)
 		// request to start relative to next immediate block
 		if (x->x_m5PlayStartTime == START_NOW)  
 		{
-			x->x_m5PlayStartTime = blockStartTime;
+			x->x_m5PlayStartTime = (double)blockStartTime;
 		}
 		
 		
