@@ -2,5 +2,7 @@
 .clangd
 .nova/
 *.o
+*.pd_darwin
+*.pd_linux
 Screenshot*
 rec.wav
