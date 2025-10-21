@@ -1959,6 +1959,7 @@ static t_int *m5_readsf_perform(t_int *w)
 		if (!x->x_eof && x->x_fifohead >= x->x_fifotail &&
 		x->x_fifohead < x->x_fifotail + wantbytes-1) 
 		{
+			sfread_cond_signal(&x->x_requestcondition);
 			pthread_mutex_unlock(&x->x_mutex);
 			for (i = 0; i < noutlets; i++){
 				for (j = vecsize, fp = x->x_outvec[i]; j--;){
