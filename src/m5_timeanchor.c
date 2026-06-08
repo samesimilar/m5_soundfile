@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include "m5_timeanchor.h"
 
-// max sequential integer representable in float
-#define FRAME_FLOAT_EPOCH 16777216
 
 // indicates that TIME ANCHOR hasn't been read yet.
 // T=0 will be defined on first request for time.

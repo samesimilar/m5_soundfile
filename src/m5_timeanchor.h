@@ -6,6 +6,10 @@
 
 #include "m_pd.h"
 
+// max sequential integer representable in float
+#define FRAME_FLOAT_EPOCH 16777216
+
+
 // Basic FTC structure to count frames with t_float.
 typedef struct _m5FrameTimeCode
 {
@@ -83,9 +87,12 @@ void m5_ftc_compare_setup(void);
 
 // Useful functions for working with FTCs and FTC time anchors...
 
+void m5_frame_time_code_init( t_m5FrameTimeCode *out) ;
+
 void m5_time_anchor_usedindsp(t_m5TimeAnchor *x);
 double m5_time_anchor_get_starttime(t_m5TimeAnchor *x);
 unsigned long m5_time_anchor_get_time_since_start(t_m5TimeAnchor *x);
+int m5_frame_time_code_compare(t_m5FrameTimeCode *left, t_m5FrameTimeCode *right);
 
 // find FTC anchor in patcher forgiven ID symbol
 t_m5TimeAnchor* m5_time_anchor_find(t_symbol *s) ;
@@ -99,4 +106,5 @@ long m5_frames_from_time_code(t_m5FrameTimeCode *in);
 void m5_frame_time_code_out(t_m5FrameTimeCode *ftc, t_outlet *outlet);
 void m5_frame_time_code_out_prepend_symbol(t_symbol* s, t_m5FrameTimeCode *ftc, t_outlet *outlet);
 char m5_frame_time_code_from_atoms(int argc, t_atom *a, t_m5FrameTimeCode *out);
+
 

@@ -15,7 +15,7 @@ objects use Posix-like threads. */
 
 #include "m5_soundfile.h"
 #include "m5_timeanchor.h"
-#include "m5_timeanchor.h"
+#include "m5_float.h"
 #include "g_canvas.h"
 #include "s_stuff.h"
 #include <float.h>
@@ -3319,4 +3319,5 @@ void m5_soundfile_setup(void)
 	m5_ftc_mult_setup();
 	m5_ftc_cycles_setup();
 	m5_ftc_compare_setup();
+	m5_float_setup();
 }
