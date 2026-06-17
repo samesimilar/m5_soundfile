@@ -8,7 +8,7 @@ lib.name = m5_soundfile
 
 # pd.src = /Users/samesimilar/rep/pd-0.55-2/src
 
-$(lib.name).class.sources = m5_soundfile.c m5_soundfile_wave.c m5_timeanchor.c
+$(lib.name).class.sources = m5_soundfile.c m5_soundfile_wave.c m5_timeanchor.c m5_float.c
 # cflags = -I$(pd.src)
 # cflags = -DDEBUG_READ_LOOP -DDEBUG_SOUNDFILE_THREADS 
 # cflags = -DDEBUG_SOUNDFILE_THREADS
