@@ -8,8 +8,6 @@
 // 'cancel' - keep the current value and don't change
 // 'now' - immediately change to the next value
 
-// TODO: figure out DSP setup function, write perform function, write new value schedule input
-
 #include <m_pd.h>
 #include <math.h>
 #include "m5_float.h"
@@ -43,7 +41,7 @@ static void m5_float_time_set(t_m5Float *x, t_symbol *s)
 
 static void *m5_float_new(t_symbol *s,  int argc, t_atom*argv)
 {
-	// todo: handle missing parameters
+	
 	t_m5Float *x = (t_m5Float *)pd_new(m5_float_class);
 	
 	int i;
@@ -110,10 +108,8 @@ static t_int *m5_float_perform(t_int *w)
 {
 	t_m5Float *x = (t_m5Float *)(w[1]);
 	int vecsize = x->x_vecsize;
-	size_t j;
-	t_sample *fp;
-	
 
+	t_sample *fp;
 	
 	
 	size_t blockStartTime = 0; // frame count since time anchor
@@ -132,15 +128,7 @@ static t_int *m5_float_perform(t_int *w)
 	
 	fp = x->x_outvec[0];
 	m5_fill_step_buffer(fp, blockStartTime, (size_t)vecsize, x->x_nextValueTime, x->x_value, x->x_nextValue);
-	
-	// if (blockStartTime + vecsize >= x->x_nextValueTime) {
-	// 	x->x_value = x->x_nextValue;
-	// }
-	// 
-	// for (j = vecsize, fp = x->x_outvec[0]; j--;){
-	// 	*fp++ = x->x_value;
-	// }
-	// 
+
 	return w + 2;
 }
 
