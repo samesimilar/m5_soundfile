@@ -136,7 +136,7 @@ static t_int *m5_float_perform(t_int *w)
 static void m5_float_dsp(t_m5Float *x, t_signal **sp)
 {
 	
-	// m5_float_time_set(x, x->x_m5TimeAnchorName);
+	m5_float_time_set(x, x->x_m5TimeAnchorName);
 	int i, noutlets = 1;
 	x->x_vecsize = sp[0]->s_n;
 	for (i = 0; i < noutlets; i++)
